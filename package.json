@@ -19,6 +19,15 @@
   },
   "keywords": ["git", "hooks", "confetti", "celebration", "productivity", "cli"],
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/is-harshul/commit-confetti.git"
+  },
+  "bugs": {
+    "url": "https://github.com/is-harshul/commit-confetti/issues"
+  },
+  "homepage": "https://github.com/is-harshul/commit-confetti#readme",
+  "author": "Harshul Kansal",
   "dependencies": {
     "commander": "^12.0.0",
     "node-notifier": "^10.0.1"
