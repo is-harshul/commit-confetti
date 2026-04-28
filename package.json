@@ -1,0 +1,33 @@
+{
+  "name": "commitconfetti",
+  "version": "1.0.0",
+  "description": "Celebrate git commits with sound and notifications",
+  "main": "dist/cli.js",
+  "bin": {
+    "commitconfetti": "./bin/commitconfetti"
+  },
+  "files": ["dist", "bin", "sounds"],
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "test": "vitest run",
+    "generate-sounds": "tsx scripts/generate-sounds.ts",
+    "prepublishOnly": "npm run build && npm run generate-sounds"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "keywords": ["git", "hooks", "confetti", "celebration", "productivity", "cli"],
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^12.0.0",
+    "node-notifier": "^10.0.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/node-notifier": "^8.0.5",
+    "tsx": "^4.0.0",
+    "typescript": "^5.4.0",
+    "vitest": "^1.6.0"
+  }
+}
