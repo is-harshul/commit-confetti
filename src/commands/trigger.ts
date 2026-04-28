@@ -1,5 +1,5 @@
 import { getLastCommitStats, getPreviousCommitDate, determineTier } from '../lib/git';
-import { playSound, getSoundPath } from '../lib/sound';
+import { playSound, getSoundPath, showConfetti } from '../lib/sound';
 import { sendNotification } from '../lib/notify';
 import { loadConfig, saveConfig } from '../lib/config';
 import { getConfigPath } from '../lib/paths';
@@ -16,6 +16,7 @@ export function trigger(): void {
 
   const soundFile = getSoundPath(config.soundPack, tier);
   playSound(soundFile);
+  showConfetti();
 
   if (config.notifications) {
     sendNotification(tier, linesChanged);

@@ -1,4 +1,4 @@
-import { playSound, getSoundPath } from '../lib/sound';
+import { playSound, getSoundPath, showConfetti } from '../lib/sound';
 import { sendNotification } from '../lib/notify';
 import { loadConfig } from '../lib/config';
 import { getConfigPath } from '../lib/paths';
@@ -11,7 +11,8 @@ export function testCelebration(): void {
 
   const soundFile = getSoundPath(config.soundPack, tier);
   playSound(soundFile);
+  showConfetti();
   sendNotification(tier, 42);
 
-  console.log('Done! You should hear a sound and see a notification.');
+  console.log('Done! You should hear a sound, see a notification, and see confetti.');
 }

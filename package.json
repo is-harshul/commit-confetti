@@ -6,7 +6,7 @@
   "bin": {
     "commitconfetti": "./bin/commitconfetti"
   },
-  "files": ["dist", "bin", "sounds"],
+  "files": ["dist", "bin", "sounds", "assets"],
   "scripts": {
     "build": "tsc",
     "dev": "tsc --watch",
