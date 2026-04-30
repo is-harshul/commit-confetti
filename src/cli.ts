@@ -5,6 +5,8 @@ import { trigger } from './commands/trigger';
 import { status } from './commands/status';
 import { setConfig } from './commands/config';
 import { testCelebration } from './commands/test';
+import { installHusky } from './commands/install-husky';
+import { uninstallHusky } from './commands/uninstall-husky';
 
 const program = new Command();
 
@@ -42,5 +44,15 @@ program
   .command('test')
   .description('Fire a sample celebration to verify install')
   .action(testCelebration);
+
+program
+  .command('install-husky')
+  .description('Install hook into the current repo\'s .husky/post-commit (run inside a husky-managed repo)')
+  .action(installHusky);
+
+program
+  .command('uninstall-husky')
+  .description('Remove CommitConfetti trigger from current repo\'s .husky/post-commit')
+  .action(uninstallHusky);
 
 program.parse();

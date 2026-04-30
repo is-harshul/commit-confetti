@@ -18,13 +18,29 @@ npx commitconfetti install
 
 That's it. Make a commit and watch the magic.
 
+### Using Husky? Run one extra step per repo
+
+Husky sets a **local** `core.hooksPath` (`.husky/_`) that overrides the global hooks path CommitConfetti relies on. In any repo that uses Husky, the global hook will not fire. Inside each Husky-managed repo, run:
+
+```sh
+npx commitconfetti install-husky
+```
+
+This appends a marked, idempotent trigger block to `.husky/post-commit` (creating the file if needed). Your existing Husky hooks continue to work untouched. To remove only the CommitConfetti block from a Husky repo:
+
+```sh
+npx commitconfetti uninstall-husky
+```
+
+> Tip: if you run `npx commitconfetti install` inside a Husky repo, it auto-detects `.husky/` and prints this hint.
+
 ## Uninstall
 
 ```sh
 npx commitconfetti uninstall
 ```
 
-Your original git hook configuration is fully restored.
+Your original git hook configuration is fully restored. Note: this removes the **global** install only. If you ran `install-husky` inside any repos, run `uninstall-husky` there too.
 
 ## What Happens When You Commit
 
@@ -63,6 +79,8 @@ If you had a previous `core.hooksPath` configured, CommitConfetti saves it and c
 | `commitconfetti status` | Show install state, sound pack, and stats |
 | `commitconfetti config <key> <value>` | Set a configuration value |
 | `commitconfetti test` | Play a test celebration to verify everything works |
+| `commitconfetti install-husky` | Install hook into the current repo's `.husky/post-commit` (run inside a Husky repo) |
+| `commitconfetti uninstall-husky` | Remove the CommitConfetti block from the current repo's `.husky/post-commit` |
 
 ## Config Options
 
@@ -146,7 +164,7 @@ Check the global hooks path:
 ```sh
 git config --global core.hooksPath
 ```
-If it's missing or unexpected, re-run `npx commitconfetti install`.
+If it's missing or unexpected, re-run `npx commitconfetti install`. If the local repo overrides it (Husky does this), `git config --get core.hooksPath` from inside the repo will return something like `.husky/_` — run `npx commitconfetti install-husky` in that repo.
 
 **Celebrations not firing after reinstall**
 The config survives uninstall/reinstall. Check if celebrations are disabled:
@@ -164,7 +182,7 @@ No. The trigger runs as a detached background process. The post-commit hook retu
 Yes. Any commit triggers a celebration, including merges and `--allow-empty`.
 
 **Can I use this with other git hook tools (Husky, lefthook)?**
-Yes. CommitConfetti saves your existing `core.hooksPath` and chains to it. Your other hooks still run.
+Yes — but Husky needs one extra step. Husky sets a **local** `core.hooksPath` per repo, which overrides CommitConfetti's global hook. Inside each Husky repo, run `npx commitconfetti install-husky` once to append a marked block to `.husky/post-commit`. lefthook and tools that don't override `core.hooksPath` work automatically — CommitConfetti saves your existing `core.hooksPath` and chains to it.
 
 **How do I reset my stats?**
 Edit `~/.config/commitconfetti/config.json` and set `commitsCelebrated` to `0`.
