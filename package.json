@@ -1,6 +1,6 @@
 {
   "name": "commitconfetti",
-  "version": "1.0.1",
+  "version": "1.0.2-beta.0",
   "description": "Celebrate git commits with sound and notifications",
   "main": "dist/cli.js",
   "bin": {
