@@ -1,5 +1,15 @@
+import * as fs from 'fs';
+import * as path from 'path';
+import * as os from 'os';
 import { loadConfig, saveConfig } from '../lib/config';
 import { getConfigPath } from '../lib/paths';
+
+function expandHome(p: string): string {
+  if (p.startsWith('~/') || p === '~') {
+    return path.join(os.homedir(), p.slice(1));
+  }
+  return p;
+}
 
 export function setConfig(key: string, value: string): void {
   const configPath = getConfigPath();
@@ -15,9 +25,27 @@ export function setConfig(key: string, value: string): void {
     case 'notifications':
       config.notifications = value === 'true';
       break;
+    case 'sounds-dir': {
+      if (value === '' || value === 'unset' || value === 'default') {
+        delete config.soundsDir;
+        break;
+      }
+      const resolved = path.resolve(expandHome(value));
+      if (!fs.existsSync(resolved)) {
+        console.error(`Path does not exist: ${resolved}`);
+        process.exit(1);
+      }
+      const stat = fs.statSync(resolved);
+      if (!stat.isDirectory()) {
+        console.error(`Not a directory: ${resolved}`);
+        process.exit(1);
+      }
+      config.soundsDir = resolved;
+      break;
+    }
     default:
       console.error(`Unknown config key: ${key}`);
-      console.error('Valid keys: enabled, sound-pack, notifications');
+      console.error('Valid keys: enabled, sound-pack, notifications, sounds-dir');
       process.exit(1);
   }
 

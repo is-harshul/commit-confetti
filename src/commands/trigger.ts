@@ -14,7 +14,7 @@ export function trigger(): void {
   const prevDate = getPreviousCommitDate();
   const tier = determineTier(linesChanged, prevDate, date);
 
-  const soundFile = getSoundPath(config.soundPack, tier);
+  const soundFile = getSoundPath(config.soundPack, tier, config.soundsDir);
   playSound(soundFile);
   showConfetti();
 

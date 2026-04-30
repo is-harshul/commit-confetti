@@ -36,11 +36,24 @@ npx commitconfetti uninstall-husky
 
 ## Uninstall
 
+### Global install
+
 ```sh
 npx commitconfetti uninstall
 ```
 
-Your original git hook configuration is fully restored. Note: this removes the **global** install only. If you ran `install-husky` inside any repos, run `uninstall-husky` there too.
+Your original `core.hooksPath` configuration is fully restored.
+
+### Husky-installed repos
+
+`uninstall` removes the **global** hook only. If you also ran `install-husky` inside any repo, remove the marked block from that repo's `.husky/post-commit`:
+
+```sh
+cd path/to/your/husky-repo
+npx commitconfetti uninstall-husky
+```
+
+Surgical and idempotent — only the `# >>> commit-confetti >>>` block is stripped, your other husky hooks stay intact. If the file ends up empty afterwards, it is deleted.
 
 ## What Happens When You Commit
 
@@ -79,6 +92,7 @@ If you had a previous `core.hooksPath` configured, CommitConfetti saves it and c
 | `commitconfetti status` | Show install state, sound pack, and stats |
 | `commitconfetti config <key> <value>` | Set a configuration value |
 | `commitconfetti test` | Play a test celebration to verify everything works |
+| `commitconfetti list-packs` | List available sound packs from all sources (config, user, builtin) |
 | `commitconfetti install-husky` | Install hook into the current repo's `.husky/post-commit` (run inside a Husky repo) |
 | `commitconfetti uninstall-husky` | Remove the CommitConfetti block from the current repo's `.husky/post-commit` |
 
@@ -91,13 +105,17 @@ Set config with `commitconfetti config <key> <value>`:
 | `enabled` | `true` / `false` | `true` | Enable or disable all celebrations |
 | `sound-pack` | string | `default` | Which sound pack folder to use |
 | `notifications` | `true` / `false` | `true` | Enable or disable desktop notifications |
+| `sounds-dir` | absolute path / `unset` | (unset) | Folder where your custom sound packs live |
 
 Examples:
 
 ```sh
 commitconfetti config sound-pack retro
+commitconfetti config sound-pack default
 commitconfetti config notifications false
 commitconfetti config enabled false    # temporarily silence celebrations
+commitconfetti config sounds-dir ~/Music/commit-packs
+commitconfetti config sounds-dir unset  # clear soundsDir, fall back to user/builtin
 ```
 
 Config is stored at `~/.config/commitconfetti/config.json` (macOS/Linux) or `%APPDATA%\commitconfetti\config.json` (Windows).
@@ -115,26 +133,90 @@ Each commit is categorized into a tier that determines the sound and notificatio
 
 Tier priority: `first-of-day` > `big` > `medium` > `small`. A 200-line commit that's also the first of the day gets the `first-of-day` celebration.
 
-## Sound Pack Format
+## Sound Packs
 
-A sound pack is a folder under `sounds/<name>/` with four WAV files:
+A sound pack is a folder named after the pack, containing one audio file per tier:
 
 ```
-sounds/
-  my-pack/
-    small.wav
-    medium.wav
-    big.wav
-    first-of-day.wav
+my-pack/
+  small.wav
+  medium.wav
+  big.wav
+  first-of-day.wav
 ```
 
-To use a custom pack:
+Supported file extensions: `wav`, `mp3`, `aiff`, `ogg`, `flac` (Windows playback only supports `wav`).
+
+### Where to put your packs
+
+CommitConfetti looks for packs in three places, in this order:
+
+1. **Your configured `soundsDir`** (highest priority) — set with `commitconfetti config sounds-dir <path>`
+2. **Your user folder** — `~/.config/commitconfetti/sounds/` (macOS/Linux) or `%APPDATA%\commitconfetti\sounds\` (Windows)
+3. **Built-in packs** — shipped with the package (lowest priority)
+
+The first matching `<root>/<pack-name>/<tier>.<ext>` wins. If a single tier file is missing inside the chosen pack, it falls back to the built-in `default` pack for that tier only — so a partial pack still works.
+
+### Quick start: drop in your own sounds
 
 ```sh
+mkdir -p ~/.config/commitconfetti/sounds/my-pack
+cp ~/Downloads/*.wav ~/.config/commitconfetti/sounds/my-pack/   # rename to small/medium/big/first-of-day.wav
 commitconfetti config sound-pack my-pack
+commitconfetti list-packs    # verify it shows up and is "ok"
+commitconfetti test          # hear it
 ```
 
-The default pack ships with simple synthesized tones — short beeps for small commits, ascending fanfares for first-of-day.
+### Or point at a folder anywhere
+
+```sh
+commitconfetti config sounds-dir ~/Music/commit-packs
+commitconfetti config sound-pack retro    # ~/Music/commit-packs/retro/{small,medium,big,first-of-day}.wav
+```
+
+### Inspect what's available
+
+```sh
+commitconfetti list-packs
+```
+
+Shows every pack from every source, marks the active one with `*`, and flags packs missing tier files.
+
+### Built-in themes
+
+Four packs ship with the package — switch any time with `commitconfetti config sound-pack <name>`:
+
+| Pack | Vibe |
+|---|---|
+| `default` | Clean synthesized sine tones |
+| `retro` | 8-bit chiptune square waves |
+| `arcade` | Coin-pickup / powerup sawtooth zaps |
+| `zen` | Soft bells with gentle attack |
+
+Preview any pack:
+
+```sh
+commitconfetti config sound-pack arcade
+commitconfetti test
+```
+
+Switch back to the default at any time:
+
+```sh
+commitconfetti config sound-pack default
+```
+
+### Contributing a new theme
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for the full guide (note options, style guidelines, PR checklist). Quick version:
+
+1. Open [`scripts/generate-sounds.ts`](scripts/generate-sounds.ts).
+2. Add an entry to the `THEMES` array with a `name`, `description`, and four note arrays (`small`, `medium`, `big`, `firstOfDay`).
+3. Each note specifies `freq`, `duration`, and optionally `waveform` (`sine`/`square`/`triangle`/`sawtooth`), `volume`, `attack`, `release`, and `vibrato`.
+4. Run `npm run generate-sounds` and commit the regenerated WAV files in `sounds/<your-theme>/`.
+5. Open a PR — keep durations under ~1.2s total per tier so celebrations stay snappy.
+
+Prefer real recordings? Drop pre-rendered WAV/MP3/AIFF/OGG/FLAC files into `sounds/<your-theme>/` directly and skip the generator. The four required filenames are `small`, `medium`, `big`, `first-of-day` (any supported extension).
 
 ## Cross-Platform Support
 
@@ -188,6 +270,8 @@ Yes — but Husky needs one extra step. Husky sets a **local** `core.hooksPath` 
 Edit `~/.config/commitconfetti/config.json` and set `commitsCelebrated` to `0`.
 
 ## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) — especially if you want to add a sound pack / theme. Quick dev setup:
 
 ```sh
 git clone https://github.com/is-harshul/commit-confetti.git

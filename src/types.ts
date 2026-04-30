@@ -5,6 +5,7 @@ export interface Config {
   soundPack: string;
   notifications: boolean;
   commitsCelebrated: number;
+  soundsDir?: string;
 }
 
 export const DEFAULT_CONFIG: Config = {

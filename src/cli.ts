@@ -7,6 +7,7 @@ import { setConfig } from './commands/config';
 import { testCelebration } from './commands/test';
 import { installHusky } from './commands/install-husky';
 import { uninstallHusky } from './commands/uninstall-husky';
+import { listPacks } from './commands/list-packs';
 
 const program = new Command();
 
@@ -37,8 +38,13 @@ program
 
 program
   .command('config <key> <value>')
-  .description('Set configuration (enabled, sound-pack, notifications)')
+  .description('Set configuration (enabled, sound-pack, notifications, sounds-dir)')
   .action(setConfig);
+
+program
+  .command('list-packs')
+  .description('List available sound packs from all sources (config, user, builtin)')
+  .action(listPacks);
 
 program
   .command('test')

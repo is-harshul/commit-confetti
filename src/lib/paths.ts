@@ -21,3 +21,11 @@ export function getHooksDir(): string {
 export function getOriginalHooksPathFile(): string {
   return path.join(getConfigDir(), 'original-hooks-path.txt');
 }
+
+export function getUserSoundsDir(): string {
+  return path.join(getConfigDir(), 'sounds');
+}
+
+export function getBuiltinSoundsDir(): string {
+  return path.join(__dirname, '..', '..', 'sounds');
+}
