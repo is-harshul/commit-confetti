@@ -90,7 +90,11 @@ If you had a previous `core.hooksPath` configured, CommitConfetti saves it and c
 | `commitconfetti uninstall` | Remove the hook and restore previous config |
 | `commitconfetti trigger` | Fire a celebration (used internally by the hook) |
 | `commitconfetti status` | Show install state, sound pack, and stats |
-| `commitconfetti config <key> <value>` | Set a configuration value |
+| `commitconfetti config <key> <value>` | Set a configuration value (see [Config Options](#config-options)) |
+| `commitconfetti config enabled <true\|false>` | Enable or disable all celebrations |
+| `commitconfetti config sound-pack <name>` | Switch active sound pack (e.g. `default`, `retro`, `arcade`, `zen`) |
+| `commitconfetti config notifications <true\|false>` | Toggle desktop notifications |
+| `commitconfetti config sounds-dir <path\|unset>` | Set or clear the custom sound packs folder |
 | `commitconfetti test` | Play a test celebration to verify everything works |
 | `commitconfetti list-packs` | List available sound packs from all sources (config, user, builtin) |
 | `commitconfetti install-husky` | Install hook into the current repo's `.husky/post-commit` (run inside a Husky repo) |
