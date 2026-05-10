@@ -1,4 +1,4 @@
-import { getLastCommitStats, getPreviousCommitDate, determineTier } from '../lib/git';
+import { getLastCommitStats, getPreviousCommitDate, determineTier, getRepoName, getBranchName, getCommitMessage } from '../lib/git';
 import { playSound, getSoundPath, showConfetti } from '../lib/sound';
 import { sendNotification } from '../lib/notify';
 import { loadConfig, saveConfig } from '../lib/config';
@@ -19,7 +19,11 @@ export function trigger(): void {
   showConfetti();
 
   if (config.notifications) {
-    sendNotification(tier, linesChanged);
+    sendNotification(tier, linesChanged, {
+      repo: getRepoName(),
+      branch: getBranchName(),
+      commitMessage: getCommitMessage(),
+    });
   }
 
   config.commitsCelebrated++;

@@ -8,16 +8,32 @@ const MESSAGES: Record<Tier, string> = {
   'small': '\uD83D\uDC4D Committed',
 };
 
-export function sendNotification(tier: Tier, linesChanged: number): void {
+export interface NotificationContext {
+  repo?: string | null;
+  branch?: string | null;
+  commitMessage?: string | null;
+}
+
+function truncate(s: string, max: number): string {
+  return s.length > max ? s.slice(0, max - 1) + '…' : s;
+}
+
+export function sendNotification(tier: Tier, linesChanged: number, ctx: NotificationContext = {}): void {
   try {
-    let message = MESSAGES[tier];
+    let header = MESSAGES[tier];
     if (tier === 'big') {
-      message = message.replace('{N}', String(linesChanged));
+      header = header.replace('{N}', String(linesChanged));
     }
-    notifier.notify({
-      title: 'CommitConfetti',
-      message,
-    });
+
+    const title = 'CommitConfetti 🎉';
+
+    const lines: string[] = [header];
+    if (ctx.repo) lines.push(`Repo \u{1F4C2}: ${ctx.repo}`);
+    if (ctx.branch) lines.push(`Branch ⎇: ${ctx.branch}`);
+    if (ctx.commitMessage) lines.push(`Msg \u{1F4AC}: ${truncate(ctx.commitMessage, 120)}`);
+    const message = lines.join('\n');
+
+    notifier.notify({ title, message });
   } catch {
     // Fail silently
   }

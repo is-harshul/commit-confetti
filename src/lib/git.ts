@@ -41,6 +41,35 @@ export function getPreviousCommitDate(): string | null {
   }
 }
 
+export function getRepoName(): string | null {
+  try {
+    const top = execSync('git rev-parse --show-toplevel', { encoding: 'utf-8' }).trim();
+    if (!top) return null;
+    const parts = top.split(/[\\/]/);
+    return parts[parts.length - 1] || null;
+  } catch {
+    return null;
+  }
+}
+
+export function getBranchName(): string | null {
+  try {
+    const branch = execSync('git rev-parse --abbrev-ref HEAD', { encoding: 'utf-8' }).trim();
+    return branch && branch !== 'HEAD' ? branch : null;
+  } catch {
+    return null;
+  }
+}
+
+export function getCommitMessage(): string | null {
+  try {
+    const msg = execSync('git log -1 --format=%s', { encoding: 'utf-8' }).trim();
+    return msg || null;
+  } catch {
+    return null;
+  }
+}
+
 export function getGlobalHooksPath(): string | null {
   try {
     return execSync('git config --global --get core.hooksPath', { encoding: 'utf-8' }).trim() || null;
