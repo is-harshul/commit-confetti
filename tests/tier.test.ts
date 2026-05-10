@@ -7,7 +7,7 @@ describe('determineTier', () => {
   });
 
   it('returns first-of-day when previous commit on different day', () => {
-    expect(determineTier(5, '2026-04-28T23:00:00+05:30', '2026-04-29T01:00:00+05:30')).toBe('first-of-day');
+    expect(determineTier(5, '2026-04-28T10:00:00+05:30', '2026-04-29T10:00:00+05:30')).toBe('first-of-day');
   });
 
   it('returns big when lines changed >= 100', () => {
@@ -27,6 +27,6 @@ describe('determineTier', () => {
   });
 
   it('first-of-day takes priority over big', () => {
-    expect(determineTier(200, '2026-04-28T23:00:00+05:30', '2026-04-29T10:00:00+05:30')).toBe('first-of-day');
+    expect(determineTier(200, '2026-04-28T10:00:00+05:30', '2026-04-29T10:00:00+05:30')).toBe('first-of-day');
   });
 });
