@@ -1,4 +1,6 @@
 import { Command } from 'commander';
+import { readFileSync } from 'fs';
+import { join } from 'path';
 import { install } from './commands/install';
 import { uninstall } from './commands/uninstall';
 import { trigger } from './commands/trigger';
@@ -9,12 +11,16 @@ import { installHusky } from './commands/install-husky';
 import { uninstallHusky } from './commands/uninstall-husky';
 import { listPacks } from './commands/list-packs';
 
+const pkg = JSON.parse(
+  readFileSync(join(__dirname, '..', 'package.json'), 'utf8')
+);
+
 const program = new Command();
 
 program
   .name('commitconfetti')
   .description('Celebrate git commits with sound and notifications')
-  .version('1.0.0');
+  .version(pkg.version);
 
 program
   .command('install')
