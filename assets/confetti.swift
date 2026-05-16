@@ -4,16 +4,19 @@ import QuartzCore
 let app = NSApplication.shared
 app.setActivationPolicy(.accessory)
 
+let previousApp = NSWorkspace.shared.frontmostApplication
+
 guard let screen = NSScreen.main else { exit(0) }
 let frame = screen.frame
 
-let window = NSWindow(
+let window = NSPanel(
     contentRect: frame,
-    styleMask: .borderless,
+    styleMask: [.borderless, .nonactivatingPanel],
     backing: .buffered,
     defer: false
 )
 window.level = .init(Int(CGWindowLevelForKey(.maximumWindow)))
+window.hidesOnDeactivate = false
 window.backgroundColor = .clear
 window.isOpaque = false
 window.hasShadow = false
@@ -85,7 +88,15 @@ contentView.layer?.addSublayer(leftEmitter)
 contentView.layer?.addSublayer(rightEmitter)
 
 window.orderFrontRegardless()
-app.activate(ignoringOtherApps: true)
+
+if let prev = previousApp {
+    prev.activate(options: [])
+}
+DispatchQueue.main.async {
+    if let prev = previousApp, !prev.isActive {
+        prev.activate(options: [])
+    }
+}
 
 DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) {
     leftEmitter.birthRate = 0
